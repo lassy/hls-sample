@@ -1,0 +1,28 @@
+rtmp {
+    server {
+        listen 1935;
+        allow play all;
+
+        application src {
+            live on;
+
+            exec ffmpeg -i rtmp://localhost/src/$name
+                    -acodec copy -c:v libx264 -b:v 256k -f flv rtmp://localhost/live/$name_low
+                    -acodec copy -c:v libx264 -b:v 512k -f flv rtmp://localhost/live/$name_mid
+                    -acodec copy -c:v libx264 -b:v 1024k -f flv rtmp://localhost/live/$name_hi;
+        }
+
+        application live {
+            live on;
+
+            hls on;
+            hls_path /var/www/vhosts/live;
+            hls_type live;
+            hls_nested on;
+
+            hls_variant _low  BANDWIDTH=320000;
+            hls_variant _mid  BANDWIDTH=640000;
+            hls_variant _hi   BANDWIDTH=1280000;
+        }
+    }
+}

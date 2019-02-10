@@ -1,6 +1,8 @@
 ---
 driver:
   name: vagrant
+  network:
+    - ["private_network", { ip: '10.0.0.2' }]
 
 provisioner:
   name: chef_zero
@@ -13,13 +15,16 @@ verifier:
   name: inspec
 
 platforms:
-  - name: ubuntu-16.04
   - name: centos-7
 
 suites:
   - name: default
     run_list:
       - recipe[hls-sample::default]
+      - recipe[hls-sample::firewall]
+      - recipe[hls-sample::ffmpeg]
+      - recipe[hls-sample::nginx]
+      - recipe[hls-sample::hls]
     verifier:
       inspec_tests:
         - test/integration/default
